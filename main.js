@@ -41,3 +41,6 @@ client.connect()
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/gymTrafficRoutes', gymTrafficRoutes);
 app.use('/api/gymEquipmentRoutes', gymEquipmentRoutes);
+
+
+module.exports = client;
