@@ -6,6 +6,10 @@ const dotenv = require('dotenv');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
+const gymEquipmentRoutes = require('./routes/gymEquipmentRoutes.js');
+const gymTrafficRoutes = require('./routes/gymTrafficRoutes.js');
+const dashboardRoutes = require('./routes/dashboardRoutes.js');
+
 
 /* Configurations */
 dotenv.config();
@@ -18,7 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cors());
 
-
+/* Postgres setup */
 const client = new Client({
     host: process.env.PG_HOST,
     user: process.env.PG_USER,
@@ -34,4 +38,6 @@ client.connect()
 
 
 /* ROUTES */
-
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/gymTrafficRoutes', gymTrafficRoutes);
+app.use('/api/gymEquipmentRoutes', gymEquipmentRoutes);
