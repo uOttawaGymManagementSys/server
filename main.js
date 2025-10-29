@@ -10,6 +10,8 @@ const gymEquipmentRoutes = require('./routes/gymEquipmentRoutes.js');
 const gymTrafficRoutes = require('./routes/gymTrafficRoutes.js');
 const dashboardRoutes = require('./routes/dashboardRoutes.js');
 
+const client = require("./db"); // import the db connection
+
 
 /* Configurations */
 dotenv.config();
@@ -22,25 +24,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cors());
 
-/* Postgres setup */
-const client = new Client({
-    host: process.env.PG_HOST,
-    user: process.env.PG_USER,
-    port: process.env.PG_PORT,
-    password: process.env.PG_PASSWORD,
-    database: process.env.PG_DATABASE
-
-});
-
-client.connect()
-    .then(() => console.log("connected to database successfully"))
-    .catch((err) => console.log(err));
-
-
 /* ROUTES */
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/gymTrafficRoutes', gymTrafficRoutes);
-app.use('/api/gymEquipmentRoutes', gymEquipmentRoutes);
+app.use('/api/traffic', gymTrafficRoutes);
+app.use('/api/machinestatus', gymEquipmentRoutes);
 
+/* Listening for requests*/
+const PORT = process.env.SERVER_PORT;
+console.log(PORT);
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
 
 module.exports = client;

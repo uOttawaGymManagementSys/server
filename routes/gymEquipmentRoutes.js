@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const getTraffic = require('../controllers/gymEquipmentController');
 
-// placeholder route
-router.get('/', (req, res) => {
-  res.send('Gym equipment route working!');
-});
+router.get('/', getTraffic);
 
 module.exports = router;
