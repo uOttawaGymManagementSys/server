@@ -10,7 +10,7 @@ const getMachines = async (req, res) => {
     console.log("MACHINE STATUS DATA FROM DATABASE:");
     console.table(result.rows); // <-- THIS prints the table
 
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows); // <-- This sends data to the client
   } catch (error) {
     console.error("Error fetching machines data:", error);
     res.status(500).json({ message: "Error fetching machines data" });
@@ -30,7 +30,7 @@ const getMachinesByGym = async (req, res) => {
     console.log(`Machines FOR GYM ID ${gymId}`);
     console.table(result.rows);
 
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows); // <-- This sends data to the client
   } catch (error) {
     console.error("Error fetching machines by gym:", error);
     res.status(500).json({ message: "Error fetching machines by gym" });

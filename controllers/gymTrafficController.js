@@ -11,7 +11,7 @@ const getTraffic = async (req, res) => {
     console.log("ALL TRAFFIC DATA:");
     console.table(result.rows);
 
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows); // <-- This sends data to the client
   } catch (error) {
     console.error("Error fetching all traffic:", error);
     res.status(500).json({ message: "Error fetching all traffic" });
@@ -31,7 +31,7 @@ const getTrafficByGym = async (req, res) => {
     console.log(`TRAFFIC FOR GYM ID ${gymId}`);
     console.table(result.rows);
 
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows); // <-- This sends data to the client
   } catch (error) {
     console.error("Error fetching traffic by gym:", error);
     res.status(500).json({ message: "Error fetching traffic by gym" });
