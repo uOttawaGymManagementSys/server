@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const getTraffic = require('../controllers/gymEquipmentController');
+const {getMachines, getMachinesByGym} = require('../controllers/gymEquipmentController');
 
-router.get('/', getTraffic);
+router.get('/', getMachines);
+
+router.get('/gym/:gymId', getMachinesByGym); // id 3 for MNT and 4 for HLC
 
 module.exports = router;
