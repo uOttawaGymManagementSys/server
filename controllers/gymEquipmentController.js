@@ -37,4 +37,41 @@ const getMachinesByGym = async (req, res) => {
   }
 };
 
-module.exports = {getMachines, getMachinesByGym};
+// POST Update the status of a specific machine
+const updateMachineStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body; // expected from the request body
+
+    if (!id || typeof status === "undefined") {
+      return res
+        .status(400)
+        .json({ message: "Machine ID and status are required." });
+    }
+
+    const result = await client.query(
+      `
+      UPDATE machine_stats
+      SET status = $1,
+          status_changed_at = NOW()
+      WHERE id = $2
+      RETURNING *;
+      `,
+      [status, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Machine not found." });
+    }
+
+    console.log(`Machine ID ${id} status updated to ${status}`);
+    res.status(200).json({
+      message: "Machine status updated successfully.",
+      updatedMachine: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating machine status:", error);
+    res.status(500).json({ message: "Error updating machine status." });
+  }
+};
+
+module.exports = { getMachines, getMachinesByGym, updateMachineStatus };
