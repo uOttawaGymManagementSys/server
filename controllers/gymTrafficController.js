@@ -38,6 +38,32 @@ const getTrafficByGym = async (req, res) => {
   }
 };
 
+// Get Today's traffic by gym_id
+const getTodayTrafficByGym = async (req, res) => {
+  try {
+    const { gymId } = req.params;
+
+    const result = await client.query(
+      `
+      SELECT * FROM traffic_stats
+      WHERE gym_id = $1
+        AND recorded_at >= CURRENT_DATE
+        AND recorded_at < CURRENT_DATE + INTERVAL '1 day'
+      ORDER BY recorded_at ASC;
+      `,
+      [gymId]
+    );
+
+    console.log(`Today's traffic for gym ${gymId}`);
+    console.table(result.rows);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching today's traffic by gym: error");
+    res.status(500).json({ message: "Error fetching today's traffic by gym" });
+  }
+};
+
 //POST traffic count
 const addTrafficCount = async (req, res) => {
   try {
@@ -69,4 +95,9 @@ const addTrafficCount = async (req, res) => {
   }
 };
 
-module.exports = { getTraffic, getTrafficByGym, addTrafficCount };
+module.exports = {
+  getTraffic,
+  getTrafficByGym,
+  addTrafficCount,
+  getTodayTrafficByGym,
+};

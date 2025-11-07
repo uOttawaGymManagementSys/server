@@ -4,11 +4,14 @@ const {
   getTraffic,
   getTrafficByGym,
   addTrafficCount,
+  getTodayTrafficByGym,
 } = require("../controllers/gymTrafficController");
 
 router.get("/", getTraffic);
 
 router.get("/gym/:gymId", getTrafficByGym); // id 3 for MNT and 4 for HLC
+
+router.get("/gym/:gymId/today", getTodayTrafficByGym);
 
 router.post("/add", addTrafficCount);
 
