@@ -38,4 +38,35 @@ const getTrafficByGym = async (req, res) => {
   }
 };
 
-module.exports = { getTraffic, getTrafficByGym };
+//POST traffic count
+const addTrafficCount = async (req, res) => {
+  try {
+    const { gym_id, traffic_count } = req.body;
+
+    if (!gym_id || !traffic_count) {
+      return res
+        .status(400)
+        .json({ message: "both gym_id and traffic_count are required." });
+    }
+
+    // Insert new record into table traffic_stats
+    const result = await client.query(
+      `INSERT INTO traffic_stats (gym_id, traffic_count, recorded_at)
+       VALUES ($1, $2, NOW())
+       RETURNING *;
+      `,
+      [gym_id, traffic_count]
+    );
+
+    console.log(`New traffic record added for gym ${gym_id}: ${traffic_count}`);
+    res.status(201).json({
+      message: "Traffic count added successfully.",
+      newRecord: result.rows[0],
+    });
+  } catch (error) {
+    console.log("Error adding traffic count: ", error);
+    res.status(500).json({ message: "Error adding traffic count." });
+  }
+};
+
+module.exports = { getTraffic, getTrafficByGym, addTrafficCount };
