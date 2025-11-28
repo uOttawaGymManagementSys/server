@@ -64,6 +64,38 @@ const getTodayTrafficByGym = async (req, res) => {
   }
 };
 
+// GET latest traffic record by gym_id
+const getLatestTrafficByGym = async (req, res) => {
+  try {
+    const { gymId } = req.params;
+
+    const result = await client.query(
+      `
+      SELECT *
+      FROM traffic_stats
+      WHERE gym_id = $1
+      ORDER BY recorded_at DESC
+      LIMIT 1;
+      `,
+      [gymId]
+    );
+
+    if (result.rows.length === 0) {
+      console.log(`No traffic records found for gym ID ${gymId}`);
+      // you can choose 200 + null or 404; I’d lean 200 with null for convenience
+      return res.status(200).json(null);
+    }
+
+    console.log(`LATEST TRAFFIC FOR GYM ID ${gymId}`);
+    console.table(result.rows);
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching latest traffic by gym:", error);
+    res.status(500).json({ message: "Error fetching latest traffic by gym" });
+  }
+};
+
 //POST traffic count
 const addTrafficCount = async (req, res) => {
   try {
@@ -100,4 +132,5 @@ module.exports = {
   getTrafficByGym,
   addTrafficCount,
   getTodayTrafficByGym,
+  getLatestTrafficByGym,
 };
