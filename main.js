@@ -29,11 +29,10 @@ app.use("/api/traffic", gymTrafficRoutes);
 app.use("/api/machinestatus", gymEquipmentRoutes);
 
 /* Listening for requests*/
-const PORT = process.env.SERVER_PORT;
-console.log(PORT);
+const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = client;
