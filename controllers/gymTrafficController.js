@@ -96,6 +96,101 @@ const getLatestTrafficByGym = async (req, res) => {
   }
 };
 
+// GET traffic stats by gym with range + aggregation
+const getTrafficStatsByGym = async (req, res) => {
+  try {
+    const { gymId } = req.params;
+    const { range = "week", agg = "daily_max" } = req.query; // defaults
+
+    if (!gymId) {
+      return res.status(400).json({ message: "gymId is required." });
+    }
+
+    let query = "";
+    const params = [gymId];
+
+    if (agg === "daily_max") {
+      // ---- DAILY MAX CASES ----
+      if (range === "week") {
+        // Last full calendar week: Monday–Sunday of last week
+        query = `
+          SELECT
+            DATE_TRUNC('day', recorded_at) AS day,
+            MAX(traffic_count) AS peak_traffic
+          FROM traffic_stats
+          WHERE gym_id = $1
+            AND recorded_at >= date_trunc('week', CURRENT_DATE) - INTERVAL '7 days'
+            AND recorded_at <  date_trunc('week', CURRENT_DATE)
+          GROUP BY day
+          ORDER BY day ASC;
+        `;
+      } else if (range === "month") {
+        // Last full calendar month (e.g. all of November if today is in December)
+        query = `
+          SELECT
+            DATE_TRUNC('day', recorded_at) AS day,
+            MAX(traffic_count) AS peak_traffic
+          FROM traffic_stats
+          WHERE gym_id = $1
+            AND recorded_at >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
+            AND recorded_at <  date_trunc('month', CURRENT_DATE)
+          GROUP BY day
+          ORDER BY day ASC;
+        `;
+      } else if (range === "6months") {
+        // Last 6 calendar months, grouped by day
+        query = `
+          SELECT
+            DATE_TRUNC('day', recorded_at) AS day,
+            MAX(traffic_count) AS peak_traffic
+          FROM traffic_stats
+          WHERE gym_id = $1
+            AND recorded_at >= date_trunc('month', CURRENT_DATE) - INTERVAL '6 months'
+            AND recorded_at <  date_trunc('month', CURRENT_DATE)
+          GROUP BY day
+          ORDER BY day ASC;
+        `;
+      } else {
+        return res
+          .status(400)
+          .json({ message: `Unsupported range for daily_max: ${range}` });
+      }
+    } else if (agg === "monthly_max") {
+      // ---- MONTHLY MAX CASES ----
+      if (range === "6months") {
+        // Last 6 calendar months, grouped by month
+        query = `
+          SELECT
+            DATE_TRUNC('month', recorded_at) AS day,
+            MAX(traffic_count) AS peak_traffic
+          FROM traffic_stats
+          WHERE gym_id = $1
+            AND recorded_at >= date_trunc('month', CURRENT_DATE) - INTERVAL '6 months'
+            AND recorded_at <  date_trunc('month', CURRENT_DATE)
+          GROUP BY day
+          ORDER BY day ASC;
+        `;
+      } else {
+        return res
+          .status(400)
+          .json({ message: `Unsupported range for monthly_max: ${range}` });
+      }
+    } else {
+      return res.status(400).json({ message: `Unsupported agg: ${agg}` });
+    }
+
+    const result = await client.query(query, params);
+
+    console.log(`STATS (agg=${agg}, range=${range}) for gym ${gymId}:`);
+    console.table(result.rows);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching traffic stats by gym:", error);
+    res.status(500).json({ message: "Error fetching traffic stats by gym" });
+  }
+};
+
 //POST traffic count
 const addTrafficCount = async (req, res) => {
   try {
@@ -133,4 +228,5 @@ module.exports = {
   addTrafficCount,
   getTodayTrafficByGym,
   getLatestTrafficByGym,
+  getTrafficStatsByGym,
 };
