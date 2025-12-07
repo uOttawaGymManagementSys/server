@@ -1,6 +1,7 @@
 # Terminal commands
 
 > npm install
+> ----
 > nodemon main.js
 
 # create a Local postgresSQL
