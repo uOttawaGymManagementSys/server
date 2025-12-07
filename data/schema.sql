@@ -1,0 +1,19 @@
+CREATE TABLE gyms (
+  gym_id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE traffic_stats (
+  id SERIAL PRIMARY KEY,
+  gym_id INT REFERENCES gyms(gym_id) ON DELETE CASCADE,
+  count INT NOT NULL,
+  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE machine_stats (
+  id SERIAL PRIMARY KEY,
+  gym_id INT REFERENCES gyms(gym_id) ON DELETE CASCADE,
+  machine_name TEXT NOT NULL,
+  status TEXT NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
